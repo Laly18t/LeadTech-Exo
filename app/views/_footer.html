@@ -11,5 +11,61 @@
         </p>
       </div>
     </footer>
+
+    <script type="text/javascript">
+      const btn = document.querySelector('#generate_zip');
+      const downloadLink = document.querySelector('#download_link');
+
+      // Fonction pour vérifier le statut du job toutes les 5 secondes
+      function checkJobStatus(tags) {
+        const intervalId = setInterval(function() {
+          fetch(`/job-status/${encodeURIComponent(tags)}`)
+            .then(response => response.json())
+            .then(data => {
+
+              if (data.status === 'success') {
+                clearInterval(intervalId);
+                btn.innerText = 'Zip';
+                btn.disabled = false;
+                downloadLink.href = data.url; // URL du fichier ZIP
+                downloadLink.style.display = 'inline-block';
+              }
+              
+            })
+            .catch(error => {
+              console.error('Error checking job status:', error);
+            });
+        }, 2000); // Vérifier toutes les 5 secondes
+      }
+
+      // Ajouter un écouteur d'événement au bouton de génération de zip
+      btn.addEventListener('click', function(event) {
+        event.preventDefault(); // Empêcher la soumission normale du formulaire
+        const tags = document.querySelector('input[name="tags"]').value;
+        
+
+        btn.innerText = 'Processing...';
+        btn.disabled = false;
+        fetch(`/zip?tags=${encodeURIComponent(tags)}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ tags: tags })
+        }).then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              console.log('Zip request sent successfully:', data);
+              checkJobStatus(tags); // Démarrer la vérification du statut du job
+            } else {
+              alert('There was an error sending your ZIP request. Please try again.');
+            }
+          })
+          .catch(error => {
+            console.error('Error sending zip request:', error);
+            alert('There was an error sending your ZIP request. Please try again.');
+          });
+      });
+    </script>
   </body>
 </html>

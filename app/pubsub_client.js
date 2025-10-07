@@ -1,8 +1,9 @@
 const { PubSub } = require('@google-cloud/pubsub');
 const { Storage } = require('@google-cloud/storage');
-const Zip = require('zip-stream');
-const got = require('got');
+const Zip = require('zip-stream').default;
+const got = require('got').default;
 const { v4: uuidv4 } = require('uuid');
+const moment = require('moment');
 const flickrService = require('./photo_model');
 
 // Initialisation des clients
@@ -70,15 +71,24 @@ async function createAndUploadZip(photos, tags) {
             });
 
             gcsStream.on('error', reject);
-            gcsStream.on('finish', () => {
+            gcsStream.on('finish', async () => {
                 const publicUrl = `https://storage.googleapis.com/${bucketName}/${filePath}`;
                 console.log(`Zip uploadé avec succès : ${publicUrl}`);
-                resolve(publicUrl);
+                const options = {
+                    action: 'read',
+                    expires: moment().add(2, 'days').unix() * 1000
+                };
+                const signedUrls = await storage
+                    .bucket(bucketName)
+                    .file(filePath)
+                    .getSignedUrl(options);
+                console.log(`URL signée (valide 48h) : ${signedUrls[0]}`);
+                resolve(signedUrls[0]);
             });
 
             // Création du flux ZIP
             console.log(`Création du flux ZIP pour ${photos.length} images...`, Zip);
-            const zip = new Zip.default();
+            const zip = new Zip();
             zip.pipe(gcsStream);
 
             console.log(`Téléchargement et compression de ${photos.length} images...`);
