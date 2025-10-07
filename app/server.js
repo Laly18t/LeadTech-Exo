@@ -3,7 +3,7 @@ const express = require('express');
 const favicon = require('serve-favicon');
 const path = require('path');
 const app = express();
-const {pubSubClient} = require('./pubsub_client.js');
+const pubSubClient = require('./pubsub_client.js');
 
 // public assets
 app.use(express.static(path.join(__dirname, 'public')));

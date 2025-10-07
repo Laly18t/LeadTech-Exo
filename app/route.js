@@ -1,6 +1,8 @@
 const formValidator = require('./form_validator');
 const photoModel = require('./photo_model');
-const {publishZipRequest} = require('./pubsub_service.js');
+const { publishZipRequest } = require('./pubsub_service.js');
+const { pubsubClient, getAllJobs, getJobStatus } = require('./pubsub_client.js');
+const moment = require('moment');
 
 function route(app) {
   app.get('/', (req, res) => {
@@ -44,17 +46,22 @@ function route(app) {
   app.post('/zip', async (req, res) => {
     try {
       const tags = req.query.tags; // tag recup depuis le query
-      
+
+      const ejsLocalVariables = {
+      zipReady: false,
+      zipUrl: null
+    };
+
       if (!tags) {
         return res.status(400).json({
           success: false,
           error: 'Les tags sont requis'
         });
       }
-      
+
       // publication dans la queue
       const messageId = await publishZipRequest(tags);
-      
+
       res.json({
         success: true,
         message: 'Demande de zip envoyée',
@@ -62,16 +69,38 @@ function route(app) {
         messageId: messageId,
         queueTopic: `dmii-${process.env.PUBSUB_TOPIC_NUMBER}`
       });
-      
+      return res.render('index', ejsLocalVariables);
+
     } catch (error) {
       console.error('Erreur dans l\'endpoint /zip:', error);
-      
+
       res.status(500).json({
         success: false,
         error: 'Erreur lors de l\'envoi de la demande de zip',
         details: error.message
       });
     }
+  });
+
+  // Endpoint pour vérifier l'état d'un job
+  app.get('/job-status/:tags', (req, res) => {
+    const tags = req.params.tags;
+    const jobStatus = pubsubClient.getJobStatus(tags);
+
+    if (jobStatus) {
+      res.json(jobStatus);
+    } else {
+      res.status(404).json({
+        error: 'Job not found',
+        tags: tags
+      });
+    }
+  });
+
+  // Endpoint pour lister tous les jobs
+  app.get('/jobs', (req, res) => {
+    const allJobs = getAllJobs();
+    res.json(allJobs);
   });
 }
 
