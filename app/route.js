@@ -1,6 +1,6 @@
 const formValidator = require('./form_validator');
 const photoModel = require('./photo_model');
-
+const {publishZipRequest} = require('./pubsub_service.js');
 
 function route(app) {
   app.get('/', (req, res) => {
@@ -41,17 +41,38 @@ function route(app) {
   });
 
   // Recup des tags depuis les query params
-  app.post('/zip', (req, res) => {
-    const tags = req.query.tags;
-    
-    // TODO: Logique de création du zip
-    
-    res.send({ 
-      success: true, 
-      message: 'Endpoint ZIP call with success',
-      tags: tags 
-    });
-});
+  app.post('/zip', async (req, res) => {
+    try {
+      const tags = req.query.tags; // tag recup depuis le query
+      
+      if (!tags) {
+        return res.status(400).json({
+          success: false,
+          error: 'Les tags sont requis'
+        });
+      }
+      
+      // publication dans la queue
+      const messageId = await publishZipRequest(tags);
+      
+      res.json({
+        success: true,
+        message: 'Demande de zip envoyée',
+        tags: tags,
+        messageId: messageId,
+        queueTopic: `dmii-${process.env.PUBSUB_TOPIC_NUMBER}`
+      });
+      
+    } catch (error) {
+      console.error('Erreur dans l\'endpoint /zip:', error);
+      
+      res.status(500).json({
+        success: false,
+        error: 'Erreur lors de l\'envoi de la demande de zip',
+        details: error.message
+      });
+    }
+  });
 }
 
 module.exports = route;
