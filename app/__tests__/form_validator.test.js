@@ -1,4 +1,4 @@
-import { formValidator } from '../../app/formValidator';
+const formValidator = require('../../app/form_validator');
 
 
 describe('isValidCommaDelimitedList(value)', () => {

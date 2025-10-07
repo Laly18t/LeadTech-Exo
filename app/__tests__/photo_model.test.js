@@ -1,9 +1,8 @@
 let photoModel;
-import jest from 'jest';
 
 describe('getFlickrPhotos(tags, tagmode, callback)', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetModules();
   });
 
   test('should return photos', () => {

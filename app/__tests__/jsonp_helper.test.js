@@ -1,9 +1,9 @@
-import { parseJSONP } from '../../app/jsonp_helper';
+const jsonpHelper = require('../../app/jsonp_helper');
 
 describe('parseJSONP(jsonpData)', () => {
   test('should parse valid jsonp data', () => {
     const jsonpData = 'jsonFlickrFeed({"title": "tagged california"});';
-    const jsObject = parseJSONP(jsonpData);
+    const jsObject = jsonpHelper.parseJSONP(jsonpData);
     expect(jsObject).toMatchObject({
       title: 'tagged california'
     });
@@ -12,7 +12,7 @@ describe('parseJSONP(jsonpData)', () => {
   test('should parse jsonp data with escaped single quotes', () => {
     const jsonpData =
       'jsonFlickrFeed({"title": "tagged california\'s coast"});';
-    const jsObject = parseJSONP(jsonpData);
+    const jsObject = jsonpHelper.parseJSONP(jsonpData);
     expect(jsObject).toMatchObject({
       title: "tagged california's coast"
     });
@@ -24,7 +24,7 @@ describe('parseJSONP(jsonpData)', () => {
 
     expect(function() {
       // call the add(item) method without passing in an item
-      parseJSONP(jsonpData);
+      jsonpHelper.parseJSONP(jsonpData);
     }).toThrowError(/Failed to convert jsonp to json/);
   });
 });
