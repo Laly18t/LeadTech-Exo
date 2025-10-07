@@ -39,6 +39,19 @@ function route(app) {
         return res.status(500).send({ error });
       });
   });
+
+  // Recup des tags depuis les query params
+  app.post('/zip', (req, res) => {
+    const tags = req.query.tags;
+    
+    // TODO: Logique de création du zip
+    
+    res.send({ 
+      success: true, 
+      message: 'Endpoint ZIP call with success',
+      tags: tags 
+    });
+});
 }
 
 module.exports = route;
