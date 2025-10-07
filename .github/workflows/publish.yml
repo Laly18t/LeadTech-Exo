@@ -16,7 +16,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build the hello-docker Docker image
-
-    run: |
-      docker build . --tag ghcr.io/laly18t/LeadTech-Exo:latest
-      docker push ghcr.io/laly18t/LeadTech-Exo:latest
+      - run:
+          docker build . --tag ghcr.io/laly18t/LeadTech-Exo:latest
+          docker push ghcr.io/laly18t/LeadTech-Exo:latest
