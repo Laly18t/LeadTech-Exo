@@ -7,7 +7,7 @@ function getFlickrPhotos(tags, tagmode) {
 
   const options = `https://api.flickr.com/services/feeds/photos_public.gne?${qs}`;
 
-  return got.default.get(options).then(response => {
+  return got.defaults.get(options).then(response => {
     const photoFeed = jsonpHelper.parseJSONP(response.body);
 
     photoFeed.items.forEach(photo => {

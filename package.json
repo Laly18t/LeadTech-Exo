@@ -18,7 +18,7 @@
   "dependencies": {
     "ejs": "^3.1.10",
     "express": "^4.21.2",
-    "got": "^14.4.9",
+    "got": "^11.8.6",
     "serve-favicon": "^2.5.1"
   },
   "devDependencies": {
@@ -33,12 +33,14 @@
     "type": "git",
     "url": "https://github.com/gregjopa/express-app-testing-demo"
   },
-  "type": "module",
   "jest": {
-    "transform": {},
     "testEnvironment": "node",
     "collectCoverage": true,
-    "coverageReporters": ["lcov", "text", "html"],
+    "coverageReporters": [
+      "lcov",
+      "text",
+      "html"
+    ],
     "coverageDirectory": "coverage"
   },
   "prettier": {

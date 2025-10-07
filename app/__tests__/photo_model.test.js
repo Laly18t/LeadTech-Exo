@@ -3,7 +3,7 @@ import jest from 'jest';
 
 describe('getFlickrPhotos(tags, tagmode, callback)', () => {
   beforeEach(() => {
-    jest.resetModules();
+    jest.clearAllMocks();
   });
 
   test('should return photos', () => {
