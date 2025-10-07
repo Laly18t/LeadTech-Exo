@@ -17,18 +17,19 @@ jobs:
       - name: Install npm dependencies
         run: npm install
 
-      - name: Run tests
-        run: npm run test-cov
+      - name: Run tests with coverage
+        run: npm test -- --coverage
 
-      - name: Coveralls
+      - name: Coveralls Parallel
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          parallel: true
-
+          parallel: true    
   finish:
     needs: test
+    if: ${{ always() }}
     runs-on: ubuntu-latest
+    
     steps:
       - name: Coveralls Finished
         uses: coverallsapp/github-action@v2
