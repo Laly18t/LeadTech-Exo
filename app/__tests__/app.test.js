@@ -1,4 +1,4 @@
-const request = require('supertest');
+import { request } from './node_modules/supertest';
 
 jest.mock('../../app/photo_model');
 const app = require('../../app/server');

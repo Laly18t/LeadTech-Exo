@@ -1,5 +1,6 @@
-const formValidator = require('./form_validator');
-const photoModel = require('./photo_model');
+import formValidator from 'form_validator.js';
+import photoModel from 'photoModel.js';
+
 
 function route(app) {
   app.get('/', (req, res) => {

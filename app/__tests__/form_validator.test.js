@@ -1,4 +1,5 @@
-const formValidator = require('../../app/form_validator');
+import { formValidator } from '../../app/formValidator';
+
 
 describe('isValidCommaDelimitedList(value)', () => {
   test('should return true for valid list of search terms', () => {

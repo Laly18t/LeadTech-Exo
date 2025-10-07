@@ -24,6 +24,6 @@ function getFlickrPhotos(tags) {
   ]);
 }
 
-module.exports = {
+export default {
   getFlickrPhotos
 };
