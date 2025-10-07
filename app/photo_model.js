@@ -1,6 +1,6 @@
-const got = require('got');
-const querystring = require('querystring');
-const jsonpHelper = require('./jsonp_helper');
+import got from 'got';
+import querystring from 'querystring';
+import jsonpHelper from '../app/jsonp_helper.js';
 
 function getFlickrPhotos(tags, tagmode) {
   const qs = querystring.stringify({ tags, tagmode, format: 'json' });

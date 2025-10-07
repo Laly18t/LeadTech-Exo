@@ -9,7 +9,7 @@
   "main": "app/server.js",
   "scripts": {
     "start": "nodemon app/server.js",
-    "test": "jest --coverage",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "test:e2e": "jest --runInBand e2e_tests/*.test.js",
     "jest": "jest --coverage app/__tests__/*.test.js",
     "lint": "eslint app e2e_tests",
@@ -33,7 +33,10 @@
     "type": "git",
     "url": "https://github.com/gregjopa/express-app-testing-demo"
   },
+  "type": "module",
   "jest": {
+    "transform": {},
+    "testEnvironment": "node",
     "collectCoverage": true,
     "coverageReporters": ["lcov", "text", "html"],
     "coverageDirectory": "coverage"
