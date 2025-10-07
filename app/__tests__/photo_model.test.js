@@ -1,4 +1,5 @@
 let photoModel;
+import jest from 'jest';
 
 describe('getFlickrPhotos(tags, tagmode, callback)', () => {
   beforeEach(() => {

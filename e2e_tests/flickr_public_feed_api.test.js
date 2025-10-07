@@ -1,6 +1,6 @@
-const got = require('got');
-const querystring = require('querystring');
-const jsonpHelper = require('../app/jsonp_helper');
+import got from 'got';
+import querystring from 'querystring';
+import jsonpHelper from '../app/jsonp_helper.js';
 
 class API {
   constructor({ tags = '', tagmode = '', format = 'json' }) {
