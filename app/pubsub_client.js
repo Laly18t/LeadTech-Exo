@@ -5,6 +5,9 @@ const got = require('got').default;
 const { v4: uuidv4 } = require('uuid');
 const moment = require('moment');
 const flickrService = require('./photo_model');
+const db = require('./firebase');
+const { ref, set } = require('firebase-admin/database');
+
 
 // Initialisation des clients
 const pubSubClient = new PubSub({
@@ -58,9 +61,10 @@ async function get10FlickrPhotos(tags) {
 async function createAndUploadZip(photos, tags) {
     return new Promise(async (resolve, reject) => {
         try {
-            const filename = `${tags.replace(/,/g, '_')}_${uuidv4()}.zip`;
-            const filePath = `zips/${filename}`;
+            const filename = `${tags.replace(/,/g, '_')}_${uuidv4()}`;
+            const filePath = `zips/${filename}.zip`;
             const file = storage.bucket(bucketName).file(filePath);
+            let zipUrl = null;
 
             const gcsStream = file.createWriteStream({
                 metadata: {
@@ -73,7 +77,6 @@ async function createAndUploadZip(photos, tags) {
             gcsStream.on('error', reject);
             gcsStream.on('finish', async () => {
                 const publicUrl = `https://storage.googleapis.com/${bucketName}/${filePath}`;
-                console.log(`Zip uploadé avec succès : ${publicUrl}`);
                 const options = {
                     action: 'read',
                     expires: moment().add(2, 'days').unix() * 1000
@@ -82,8 +85,11 @@ async function createAndUploadZip(photos, tags) {
                     .bucket(bucketName)
                     .file(filePath)
                     .getSignedUrl(options);
-                console.log(`URL signée (valide 48h) : ${signedUrls[0]}`);
+                zipUrl = signedUrls[0];
                 resolve(signedUrls[0]);
+
+                saveZipData(filename, zipUrl, file)
+                    .catch(console.error); 
             });
 
             // Création du flux ZIP
@@ -107,11 +113,33 @@ async function createAndUploadZip(photos, tags) {
                 }
             }
 
+            // TODO : ajouter le zip au firebase database 
+
+            
+
             zip.finalize();
         } catch (err) {
             reject(err);
         }
     });
+}
+
+async function saveZipData(filename, storagePath, publicUrl) {
+    const now = new Date().toISOString().replace(/[:.]/g, '-');
+    const path = `laly/${now}/${filename}`;
+
+    const data = {
+        filename,
+        storagePath,
+        publicUrl: '/test',
+        createdAt: now,
+    };
+
+    const dataRef = db.ref('zips');
+    dataRef.set({
+        [filename]: data
+    });
+    console.log(`✅ Données enregistrées dans Firebase : ${path}`);
 }
 
 /**
@@ -149,8 +177,8 @@ async function processZipRequest(tags) {
         };
 
         console.log(`Traitement terminé avec succès pour: ${tags}`);
-        console.log(`   URL du zip: ${zipUrl}`);
-        console.log(`   Photos: ${photos.length}`);
+        console.log(`URL du zip: ${zipUrl}`);
+        console.log(`Photos: ${photos.length}`);
 
     } catch (error) {
         console.error(`Erreur lors du traitement pour ${tags}:`, error);
